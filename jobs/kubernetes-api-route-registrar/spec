@@ -35,3 +35,8 @@ properties:
   external_kubo_port:
     description: "Externally accessible port"
     example: 2749
+
+consumes:
+- name: cf-credentials
+  type: cf-credentials
+  optional: true

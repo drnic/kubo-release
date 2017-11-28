@@ -54,4 +54,6 @@ consumes:
   type: kubernetes-workers
 - name: nats
   type: nats
+- name: cf-credentials
+  type: cf-credentials
   optional: true

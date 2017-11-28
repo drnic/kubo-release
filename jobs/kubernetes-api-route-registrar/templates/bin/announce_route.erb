@@ -7,10 +7,19 @@ set -x
 PATH=/var/vcap/packages/jq/bin/:$PATH
 
 # Job spec config
-UAA_API_URL="<%=p('cloud_foundry.uaa_url') %>"
-UAA_CLIENT_ID="<%=p('cloud_foundry.uaa_client_id') %>"
-UAA_CLIENT_SECRET="<%=p('cloud_foundry.uaa_client_secret') %>"
-CLOUD_FOUNDRY_API_URL="<%=p('cloud_foundry.api_url') %>"
+<%
+cf_credentials = api_url = uaa_url = routing_api_client_secret = nil
+if_link("cf-credentials") do |cf|
+  cf_credentials = cf
+  api_url = cf.p("api_url")
+  uaa_url = cf.p("uaa_url")
+  routing_api_client_secret = cf.p("uaa_clients")["routing_api_client"]["secret"]
+end
+%>
+UAA_API_URL="<%=p('cloud_foundry.uaa_url', uaa_url) %>"
+UAA_CLIENT_ID="<%=p('cloud_foundry.uaa_client_id', 'routing_api_client') %>"
+UAA_CLIENT_SECRET="<%=p('cloud_foundry.uaa_client_secret', routing_api_client_secret) %>"
+CLOUD_FOUNDRY_API_URL="<%=p('cloud_foundry.api_url', api_url) %>"
 BACKEND_PORT="<%=p('backend_port') %>"
 BACKEND_IP="<%= spec.ip %>"
 KUBO_PORT="<%=p('external_kubo_port') %>"
