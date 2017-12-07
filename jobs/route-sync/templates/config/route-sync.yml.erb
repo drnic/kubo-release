@@ -25,7 +25,6 @@ if_p('nats.password') do |prop|
 end.else do
   nats_password = link('nats').p("nats.password")
 end
-
 %>
 
 nats_servers:
@@ -34,19 +33,26 @@ nats_servers:
      user: <%=nats_user %>
      password: <%=nats_password %>
 <% end %>
+
 <%
-cf_credentials = api_url = uaa_url = username = password = routing_api_client_secret = nil
-if_link("cf-credentials") do |cf|
-  cf_credentials = cf
-  api_url = cf.p("api_url")
-  uaa_url = cf.p("uaa_url")
-  routing_api_client_secret = cf.p("uaa_clients")["routing_api_client"]["secret"]
+routing_api_client = p("cloud_foundry.routing_api_client_id")
+api_url = uaa_url = app_domain = routing_api_client_secret = nil
+skip_tls_verification = false # default from spec file
+if_link("routing_api") do |routing|
+  routing_api_client_secret = routing.p("routing_api.clients")[routing_api_client]["secret"]
+end
+if_link("cloud_controller") do |cc|
+  system_domain = cc.p("system_domain")
+  api_url = "https://api.#{system_domain}"
+  uaa_url = "https://uaa.#{system_domain}"
+  skip_tls_verification = true # currently default to true as 'skip_tls_verification' not provided in link
+  app_domain = cc.p("app_domains").first
 end
 %>
-app_domain_name: <%= p("cloud_foundry.app_domain") %>
+app_domain_name: <%= p("cloud_foundry.app_domain", app_domain) %>
 uaa_api_url: <%= p("cloud_foundry.uaa_url", uaa_url) %>
 routing_api_url: <%= p("cloud_foundry.routing_api_url", api_url) %>
-routing_api_username: <%= p("cloud_foundry.routing_api_client_id", "routing_api_client") %>
+routing_api_username: <%= routing_api_client %>
 routing_api_client_secret: <%= p("cloud_foundry.routing_api_client_secret", routing_api_client_secret) %>
-skip_tls_verification: <%= p("cloud_foundry.skip_tls_verification", !!cf_credentials) %>
+skip_tls_verification: <%= p("cloud_foundry.skip_tls_verification", skip_tls_verification) %>
 kube_config_path: /var/vcap/jobs/route-sync/config/kubeconfig

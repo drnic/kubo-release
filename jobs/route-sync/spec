@@ -11,6 +11,19 @@ packages:
 - route-sync
 - pid_utils
 
+consumes:
+- name: kubernetes-workers
+  type: kubernetes-workers
+- name: nats
+  type: nats
+  optional: true
+- name: cloud_controller
+  type: cloud_controller
+  optional: true
+- name: routing_api
+  type: routing_api
+  optional: true
+
 properties:
   cloud_foundry:
     uaa_url:
@@ -20,8 +33,8 @@ properties:
       description: "URL for Routing API"
       example: http://api.cf.cf-app.com
     routing_api_client_id:
-      description: "Routing API client id (UAA)"
-      example: tcp_router
+      description: "Routing API client id (UAA)."
+      default: cfcr_routing_api_client
     routing_api_client_secret:
       description: "Routing API client secret"
     skip_tls_verification:
@@ -48,12 +61,3 @@ properties:
       description: The token to access kubernetes API
   tls.kubernetes:
     description: "Certificate and private key for the Kubernetes master"
-
-consumes:
-- name: kubernetes-workers
-  type: kubernetes-workers
-- name: nats
-  type: nats
-- name: cf-credentials
-  type: cf-credentials
-  optional: true

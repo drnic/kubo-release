@@ -10,6 +10,14 @@ packages:
 - jq
 - pid_utils
 
+consumes:
+- name: cloud_controller
+  type: cloud_controller
+  optional: true
+- name: routing_api
+  type: routing_api
+  optional: true
+
 properties:
   register_interval:
     description: "Amount of time, in seconds, between registrations of routes"
@@ -24,7 +32,7 @@ properties:
       example: http://uaa.cf.cf-app.com
     uaa_client_id:
       description: "UAA client id"
-      example: client_id
+      default: cfcr_routing_api_client
     uaa_client_secret:
       description: "UAA client secret"
       example: "kljsfdkjldfskjlfsdsfd"
@@ -35,8 +43,3 @@ properties:
   external_kubo_port:
     description: "Externally accessible port"
     example: 2749
-
-consumes:
-- name: cf-credentials
-  type: cf-credentials
-  optional: true
